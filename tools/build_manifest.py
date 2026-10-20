@@ -59,7 +59,9 @@ def build_rows(seed: int, holdout_fraction: float) -> list[dict[str, Any]]:
     except ImportError as exc:
         raise SystemExit("Install dependencies first: python -m pip install -r requirements.txt") from exc
 
-    dataset = load_dataset(DATASET, split="test", revision=REVISION)
+    # Stream rows so the Arrow cache does not persist reference patches or test
+    # oracles. Only the whitelisted prompt fields below are written to disk.
+    dataset = load_dataset(DATASET, split="test", revision=REVISION, streaming=True)
     rows: list[dict[str, Any]] = []
     for source in dataset:
         row = {key: source.get(key) for key in KEEP_FIELDS}

@@ -20,7 +20,7 @@ python tools/build_manifest.py --output data/swebench_verified_prompts.jsonl
 python tools/validate_manifest.py data/swebench_verified_prompts.jsonl
 ```
 
-The generated manifest is small. It contains 500 issue prompts, repository names, and base commits; it does not include solution patches or tests. To make a stable quick slice for early iteration:
+The builder streams the pinned dataset instead of caching its full Arrow table. The generated manifest is small (about 1.6 MB for all 500 tasks) and contains issue prompts, repository names, and base commits; it does not include solution patches or tests. To make a stable quick slice for early iteration:
 
 ```bash
 python tools/build_manifest.py --split development --limit 32 --seed 20261020 --output data/dev32.jsonl
