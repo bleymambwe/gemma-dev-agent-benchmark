@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import random
 from pathlib import Path
 from typing import Any
@@ -39,6 +40,48 @@ def bootstrap_interval(deltas: list[int], iterations: int, seed: int) -> tuple[f
     n = len(deltas)
     estimates = sorted(sum(rng.choices(deltas, k=n)) / n for _ in range(iterations))
     return estimates[int(0.025 * iterations)], estimates[min(iterations - 1, int(0.975 * iterations))]
+
+
+# Optional per-task cost fields, first match wins. Only reported when every task in
+# both runs has a numeric value, so a partial log never produces a misleading mean.
+COST_FIELDS = {
+    "elapsed_seconds": ("elapsed_seconds", "duration_seconds", "wall_time_seconds"),
+    "total_tokens": ("total_tokens", "tokens"),
+    "tool_calls": ("tool_calls", "num_tool_calls"),
+}
+
+
+def mcnemar_exact_p(improved: int, regressed: int) -> float:
+    """Two-sided exact binomial (sign) test on the discordant pairs."""
+    n = improved + regressed
+    if n == 0:
+        return 1.0
+    k = min(improved, regressed)
+    tail = sum(math.comb(n, i) for i in range(k + 1)) / 2**n
+    return min(1.0, 2 * tail)
+
+
+def cost_summary(baseline: dict[str, dict[str, Any]], candidate: dict[str, dict[str, Any]], ids: list[str]) -> dict[str, Any]:
+    report: dict[str, Any] = {}
+    for label, names in COST_FIELDS.items():
+        def pick(row: dict[str, Any]) -> float | None:
+            for name in names:
+                value = row.get(name)
+                if isinstance(value, (int, float)) and not isinstance(value, bool):
+                    return float(value)
+            return None
+
+        pairs = [(pick(baseline[key]), pick(candidate[key])) for key in ids]
+        if any(a is None or b is None for a, b in pairs):
+            continue
+        base_mean = sum(a for a, _ in pairs) / len(pairs)
+        cand_mean = sum(b for _, b in pairs) / len(pairs)
+        report[label] = {
+            "baseline_mean": base_mean,
+            "candidate_mean": cand_mean,
+            "change_percent": (100 * (cand_mean - base_mean) / base_mean) if base_mean else None,
+        }
+    return report
 
 
 def main() -> None:
@@ -84,9 +127,13 @@ def main() -> None:
         "improved_tasks": improved,
         "regressed_tasks": regressed,
         "unchanged_tasks": len(ids) - improved - regressed,
+        "mcnemar_exact_p_two_sided": mcnemar_exact_p(improved, regressed),
         "bootstrap_iterations": args.bootstrap,
         "seed": args.seed,
     }
+    costs = cost_summary(baseline, candidate, ids)
+    if costs:
+        report["cost"] = costs
     repositories: dict[str, list[str]] = {}
     for instance_id in ids:
         repo = candidate[instance_id].get("repo") or baseline[instance_id].get("repo")

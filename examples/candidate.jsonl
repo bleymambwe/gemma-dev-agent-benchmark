@@ -1,0 +1,4 @@
+{"instance_id":"toy-1","resolved":true,"repo":"repo-a"}
+{"instance_id":"toy-2","resolved":true,"repo":"repo-a"}
+{"instance_id":"toy-3","resolved":true,"repo":"repo-b"}
+{"instance_id":"toy-4","resolved":false,"repo":"repo-b"}

@@ -1,0 +1,71 @@
+{
+  "seed": 20261020,
+  "manifest_sha256": "004334986d6bb2977bd6b47a048405f3b6cebd477f05a60ffdda62af721b133a",
+  "source_dataset": "SWE-bench/SWE-bench_Verified",
+  "source_revision": "78f471bf655a3137b2e8a75af1501690ec009ec3",
+  "tiers": {
+    "smoke8": {
+      "tasks": 8,
+      "repositories": {
+        "mwaskom/seaborn": 1,
+        "pallets/flask": 1,
+        "psf/requests": 1,
+        "pydata/xarray": 1,
+        "pylint-dev/pylint": 1,
+        "pytest-dev/pytest": 1,
+        "scikit-learn/scikit-learn": 1,
+        "sympy/sympy": 1
+      }
+    },
+    "dev32": {
+      "tasks": 32,
+      "repositories": {
+        "django/django": 4,
+        "mwaskom/seaborn": 2,
+        "pallets/flask": 1,
+        "psf/requests": 5,
+        "pydata/xarray": 4,
+        "pylint-dev/pylint": 4,
+        "pytest-dev/pytest": 4,
+        "scikit-learn/scikit-learn": 4,
+        "sympy/sympy": 4
+      }
+    },
+    "dev96": {
+      "tasks": 96,
+      "repositories": {
+        "django/django": 15,
+        "mwaskom/seaborn": 2,
+        "pallets/flask": 1,
+        "psf/requests": 8,
+        "pydata/xarray": 15,
+        "pylint-dev/pylint": 10,
+        "pytest-dev/pytest": 15,
+        "scikit-learn/scikit-learn": 15,
+        "sympy/sympy": 15
+      }
+    },
+    "dev-all": {
+      "tasks": 400,
+      "repositories": {
+        "django/django": 231,
+        "mwaskom/seaborn": 2,
+        "pallets/flask": 1,
+        "psf/requests": 8,
+        "pydata/xarray": 22,
+        "pylint-dev/pylint": 10,
+        "pytest-dev/pytest": 19,
+        "scikit-learn/scikit-learn": 32,
+        "sympy/sympy": 75
+      }
+    },
+    "holdout": {
+      "tasks": 100,
+      "repositories": {
+        "astropy/astropy": 22,
+        "matplotlib/matplotlib": 34,
+        "sphinx-doc/sphinx": 44
+      }
+    }
+  }
+}
